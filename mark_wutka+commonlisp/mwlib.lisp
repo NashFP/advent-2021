@@ -49,3 +49,6 @@
 
 (defun partial (f &rest args)
   (lambda (&rest others) (apply f (append args others))))
+
+(defun intern-uc (sym)
+  (intern (string-upcase sym)))

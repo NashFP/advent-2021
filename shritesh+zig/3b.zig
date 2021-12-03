@@ -1,6 +1,8 @@
 const std = @import("std");
 
-fn mostCommon(numbers: [][]const u8, to_consider: []const bool, idx: usize) ?u8 {
+const max_nums = 1024;
+
+fn common(most: bool, numbers: [][]const u8, to_consider: []const bool, idx: usize) ?u8 {
     var count: isize = 0;
     for (numbers) |n, i| {
         if (!to_consider[i]) continue;
@@ -12,28 +14,19 @@ fn mostCommon(numbers: [][]const u8, to_consider: []const bool, idx: usize) ?u8 
     }
 
     if (count < 0) {
-        return '0';
+        if (most) return '0' else return '1';
     } else if (count > 0) {
-        return '1';
+        if (most) return '1' else return '0';
     } else return null;
 }
 
 fn criteria(numbers: [][]const u8, tie: u8, most: bool) !u32 {
-    var to_consider_buffer: [1024]bool = .{true} ** 1024;
-    var to_consider = to_consider_buffer[0..numbers.len];
+    var buffer: [max_nums]bool = .{true} ** max_nums;
+    var to_consider = buffer[0..numbers.len];
     var remaining = numbers.len;
 
     loop: for (numbers[0]) |_, i| {
-        var bit: u8 = tie;
-        if (mostCommon(numbers, to_consider, i)) |mcb| {
-            if (most) {
-                bit = mcb;
-            } else if (mcb == '0') {
-                bit = '1';
-            } else {
-                bit = '0';
-            }
-        }
+        var bit = common(most, numbers, to_consider, i) orelse tie;
 
         for (to_consider) |*tc, n| {
             if (!tc.*) continue;
@@ -52,7 +45,7 @@ fn criteria(numbers: [][]const u8, tie: u8, most: bool) !u32 {
 }
 
 fn run(input: []const u8) !u32 {
-    var numbers: [1024][]const u8 = undefined;
+    var numbers: [max_nums][]const u8 = undefined;
     var count: usize = 0;
 
     var tokens = std.mem.tokenize(u8, input, "\n ");

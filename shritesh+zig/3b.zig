@@ -1,11 +1,19 @@
 const std = @import("std");
 
-const max_nums = 1024;
+inline fn isSet(set: u1024, idx: usize) bool {
+    const mask = @as(u1024, 1) << @intCast(u10, idx);
+    return set & mask != 0;
+}
 
-fn common(most: bool, numbers: [][]const u8, to_consider: []const bool, idx: usize) ?u8 {
+inline fn setBit(set: *u1024, idx: usize) void {
+    const mask = @as(u1024, 1) << @intCast(u10, idx);
+    set.* = set.* | mask;
+}
+
+fn common(most: bool, numbers: [][]const u8, skip: u1024, idx: usize) ?u8 {
     var count: isize = 0;
     for (numbers) |n, i| {
-        if (!to_consider[i]) continue;
+        if (isSet(skip, i)) continue;
         switch (n[idx]) {
             '0' => count -= 1,
             '1' => count += 1,
@@ -21,31 +29,29 @@ fn common(most: bool, numbers: [][]const u8, to_consider: []const bool, idx: usi
 }
 
 fn criteria(numbers: [][]const u8, tie: u8, most: bool) !u32 {
-    var buffer: [max_nums]bool = .{true} ** max_nums;
-    var to_consider = buffer[0..numbers.len];
+    var skip: u1024 = 0;
     var remaining = numbers.len;
 
     loop: for (numbers[0]) |_, i| {
-        var bit = common(most, numbers, to_consider, i) orelse tie;
+        var bit = common(most, numbers, skip, i) orelse tie;
 
-        for (to_consider) |*tc, n| {
-            if (!tc.*) continue;
-            if (numbers[n][i] != bit) {
-                tc.* = false;
+        for (numbers) |n, j| {
+            if (isSet(skip, j)) continue;
+
+            if (n[i] != bit) {
+                setBit(&skip, j);
                 remaining -= 1;
             }
 
             if (remaining == 1) break :loop;
         }
-    } else if (remaining != 1) return error.NotFound;
+    } else return error.NotFound;
 
-    for (to_consider) |tc, idx| {
-        if (tc) return std.fmt.parseInt(u32, numbers[idx], 2);
-    } else unreachable;
+    return std.fmt.parseInt(u32, numbers[@ctz(u1024, ~skip)], 2);
 }
 
 fn run(input: []const u8) !u32 {
-    var numbers: [max_nums][]const u8 = undefined;
+    var numbers: [1024][]const u8 = undefined;
     var count: usize = 0;
 
     var tokens = std.mem.tokenize(u8, input, "\n ");

@@ -1,47 +1,37 @@
 const std = @import("std");
 
-fn calculate(numbers: []const u16) !u32 {
-    var gamma: u16 = 0;
-    var epsilon: u16 = 0;
-
-    var i: u4 = 0;
-    while (true) : (i += 1) {
-        const mask = @as(u16, 1) << i;
-
-        var zeroes: usize = 0;
-        var ones: usize = 0;
-        for (numbers) |n| {
-            if (n & mask == 0) {
-                zeroes += 1;
-            } else {
-                ones += 1;
-            }
-        }
-
-        if (zeroes > ones and ones > 0) {
-            epsilon = epsilon | mask;
-        } else if (ones > zeroes) {
-            gamma = gamma | mask;
-        }
-
-        if (i == 15) break;
-    }
-
-    return @as(u32, gamma) * @as(u32, epsilon);
-}
-
 fn run(input: []const u8) !u32 {
-    var numbers: [1024]u16 = undefined;
-    var count: usize = 0;
+    var zeroes: [16]u16 = .{0} ** 16;
+    var ones: [16]u16 = .{0} ** 16;
+    var len: usize = 0;
 
     var tokens = std.mem.tokenize(u8, input, " \n");
     while (tokens.next()) |t| {
-        numbers[count] = try std.fmt.parseInt(u16, t, 2);
-        count += 1;
-        if (count == 1024) return error.TooManyNumbers;
+        len = t.len;
+
+        for (t) |c, i| {
+            if (c == '0') {
+                zeroes[i] += 1;
+            } else if (c == '1') {
+                ones[i] += 1;
+            } else return error.InvalidCharacter;
+        }
     }
 
-    return try calculate(numbers[0..count]);
+    var gamma: u32 = 0;
+    var epsilon: u32 = 0;
+
+    var i: usize = 0;
+    while (i < len) : (i += 1) {
+        const mask = @as(u32, 1) << @intCast(u4, len - i - 1);
+        if (zeroes[i] > ones[i]) {
+            epsilon = epsilon | mask;
+        } else if (ones[i] > zeroes[i]) {
+            gamma = gamma | mask;
+        }
+    }
+
+    return gamma * epsilon;
 }
 
 pub fn main() !void {

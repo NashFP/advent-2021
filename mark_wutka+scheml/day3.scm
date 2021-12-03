@@ -39,7 +39,9 @@
         (cons target-bit acc)))))
 
 (define (invert-bits bits)
-  (map (lambda (b) (- 1 b)) bits))
+  ;;; Partial application of - this way causes the
+  ;;; function to be (1 - x) which is what we want
+  (map (- 1) bits))
 
 (define (day3a)
   (let* ((bits (map string-to-bits (read-lines "day3.txt")))

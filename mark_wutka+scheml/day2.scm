@@ -12,7 +12,7 @@
 ;;; for both part A and part B
 ;;; where old-depth is the calculation for
 ;;; part A.
-(define (process-command command curr-state)
+(define (process-command curr-state command)
   (let (((State pos old-depth depth aim) curr-state))
     (match command
           ((Forward amt) (State (+ pos amt)

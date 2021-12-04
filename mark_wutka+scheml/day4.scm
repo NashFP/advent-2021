@@ -27,7 +27,7 @@
 (define (col-bingo board col)
   (all (= -1) (board-col board col)))
 
-;;; Returns try if a board has a winning row or column
+;;; Returns true if a board has a winning row or column
 (define (board-wins board)
   (or (some (col-bingo board) (range 0 4))
       (some (row-bingo board) (range 0 4))))
@@ -61,7 +61,7 @@
     ;;; multiply the winning number...
     (* number 
        ;;; by the sum of the non-called numbers in the board
-       (array-fold (lambda (n s) (if (>= n 0) (+ s n) s)) 0 board))))
+       (array-fold (lambda (s n) (if (>= n 0) (+ s n) s)) 0 board))))
 
 (define (day4a)
   (let* ((groups (split-groups (read-lines "day4.txt")))

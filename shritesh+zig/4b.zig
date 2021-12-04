@@ -30,31 +30,31 @@ fn eventualWinnerScore(bingos: []Bingo, numbers: []u8) !u32 {
 
 const Bingo = struct {
     numbers: [25]u8 = undefined,
-    rowMarked: u25 = 0, // row-major bitset
-    colMarked: u25 = 0, // col-major bitset, makes hasWon easier
+    marked: u25 = 0,
 
     fn mark(self: *Bingo, number: u8) bool {
         for (self.numbers) |n, i| {
             if (n == number) {
-                self.rowMarked |= @as(u25, 1) << @intCast(u5, i);
-                self.colMarked |= @as(u25, 1) << @intCast(u5, 5 * (i % 5) + (i / 5)); // Column transpose
+                self.marked |= @as(u25, 1) << @intCast(u5, i);
                 return true;
             }
         } else return false;
     }
 
-    inline fn isRowMarked(self: Bingo, n: usize) bool {
+    inline fn isMarked(self: Bingo, n: usize) bool {
         const mask = @as(u25, 1) << @intCast(u5, n);
-        return self.rowMarked & mask != 0;
+        return self.marked & mask != 0;
     }
 
     fn hasWon(self: Bingo) bool {
-        var mask = @as(u25, 0b11111);
+        var rowMask = @as(u25, 0b11111);
+        var colMask = @as(u25, 0b00001_00001_00001_00001_00001);
         var i: usize = 0;
         while (i < 5) : (i += 1) {
-            if (self.rowMarked & mask == mask) return true;
-            if (self.colMarked & mask == mask) return true;
-            mask <<= 5;
+            if (self.marked & rowMask == rowMask) return true;
+            if (self.marked & colMask == colMask) return true;
+            rowMask <<= 5;
+            colMask <<= 1;
         } else return false;
     }
 
@@ -62,7 +62,7 @@ const Bingo = struct {
         var total: u16 = 0;
 
         for (self.numbers) |n, i| {
-            if (!self.isRowMarked(i)) total += n;
+            if (!self.isMarked(i)) total += n;
         }
 
         return total;
@@ -74,7 +74,7 @@ const Bingo = struct {
         for (self.numbers) |n, i| {
             if (i % 5 == 0) std.debug.print("\n", .{});
 
-            if (self.isRowMarked(i)) {
+            if (self.isMarked(i)) {
                 std.debug.print("\t\x1B[4m{}\x1B[0m", .{n}); // ANSI underline
             } else std.debug.print("\t{}", .{n});
         }

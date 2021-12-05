@@ -25,27 +25,12 @@ const Line = struct {
         var tx = nums.next() orelse return error.ReadError;
         var ty = nums.next() orelse return error.ReadError;
 
-        var line = Line{
+        return Line{
             .from_x = try std.fmt.parseInt(u16, fx, 10),
             .from_y = try std.fmt.parseInt(u16, fy, 10),
             .to_x = try std.fmt.parseInt(u16, tx, 10),
             .to_y = try std.fmt.parseInt(u16, ty, 10),
         };
-
-        if (line.from_x > line.to_x) {
-            std.mem.swap(u16, &line.from_x, &line.to_x);
-            std.mem.swap(u16, &line.from_y, &line.to_y);
-        }
-
-        return line;
-    }
-
-    fn isHorizontal(self: Line) bool {
-        return self.from_y == self.to_y;
-    }
-
-    fn isVertical(self: Line) bool {
-        return self.from_x == self.to_x;
     }
 };
 
@@ -55,32 +40,15 @@ fn run(input: []const u8) !u32 {
     var lines = std.mem.split(u8, input, "\n");
     while (lines.next()) |l| {
         const line = try Line.parse(l);
-        if (line.isHorizontal()) {
-            const y = line.from_y;
-            var x = line.from_x;
-            while (x <= line.to_x) : (x += 1) {
-                grid[x][y] +|= 1;
-            }
-        } else if (line.isVertical()) {
-            const x = line.from_x;
-            const from_y = @minimum(line.from_y, line.to_y);
-            const to_y = @maximum(line.from_y, line.to_y);
 
-            var y = from_y;
-            while (y <= to_y) : (y += 1) {
-                grid[x][y] +|= 1;
-            }
-        } else {
-            var x = line.from_x;
-            var y = line.from_y;
-            while (x <= line.to_x) : (x += 1) {
-                grid[x][y] +|= 1;
+        var x = line.from_x;
+        var y = line.from_y;
+        grid[x][y] +|= 1;
 
-                if (y > line.to_y)
-                    y -= 1
-                else if (y < line.to_y)
-                    y += 1;
-            }
+        while (!(x == line.to_x and y == line.to_y)) {
+            if (x < line.to_x) x += 1 else if (x > line.to_x) x -= 1;
+            if (y < line.to_y) y += 1 else if (y > line.to_y) y -= 1;
+            grid[x][y] +|= 1;
         }
     }
 

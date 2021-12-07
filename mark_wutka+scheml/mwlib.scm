@@ -29,3 +29,9 @@
 
 (define (split-groups lines)
   (split-groups' lines nil nil))
+
+(define (list-min l)
+  (fold min (head l) (tail l)))
+
+(define (list-max l)
+  (fold max (head l) (tail l)))

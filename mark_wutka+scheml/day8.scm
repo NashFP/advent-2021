@@ -37,6 +37,11 @@
 (define (find-six digits-list middle-seg left-bottom-seg)
   (head (filter (matches-six? middle-seg left-bottom-seg) digits-list)))
 
+(define (one-member s) (head (set->list s)))
+
+(define (get-seg-from-difference s1 s2)
+  (one-member (set-difference s1 s2)))
+                                 
 (define (deduce-digits digits-list)
   ;;; 1, 7, 4, and 8 are immediately known
   (let* ((one-set (find-with-size digits-list 2))
@@ -44,7 +49,7 @@
          (four-set (find-with-size digits-list 4))
          (eight-set (find-with-size digits-list 7))
          ;;; We can deduce the top segment by subtracting 1's segments from 7
-         (top-seg (head (set->list (set-difference seven-set one-set))))
+         (top-seg (get-seg-from-difference seven-set one-set))
          ;;; We can find 9 by adding the top segment to 4 and looking for
          ;;; a 6-segment digit that has those segments
          (nine-match (set-put four-set top-seg))
@@ -52,23 +57,23 @@
                                             nine-match 6))
          ;;; We can deduce the bottom segment by subtracting the nine-match
          ;;; segments from the nine-set
-         (bottom-seg (head (set->list (set-difference nine-set nine-match))))
+         (bottom-seg (get-seg-from-difference nine-set nine-match))
          ;;; We can find three by adding the bottom segment to 7 and looking
          ;;; for a 5-segment digit that has those segments
          (three-match (set-put seven-set bottom-seg))
          (three-set (find-matching-with-size digits-list three-match 5))
          ;;; We can deduce the middle segment by subtracting three-match from three-set
-         (middle-seg (head (set->list (set-difference three-set three-match))))
+         (middle-seg (get-seg-from-difference three-set three-match))
          ;;; We can deduce the left bottom by subtracting nine-set from eight-set
-         (left-bottom-seg (head (set->list (set-difference eight-set nine-set))))
+         (left-bottom-seg (get-seg-from-difference eight-set nine-set))
          ;;; We can deduce the left top by subtracting three-set+left-bottom-seg from eight-set
-         (left-top-seg (head (set->list (set-difference eight-set (set-put three-set left-bottom-seg)))))
+         (left-top-seg (get-seg-from-difference eight-set (set-put three-set left-bottom-seg)))
          ;;; Look for six using a specialized function
          (six-set (find-six digits-list middle-seg left-bottom-seg))
          ;;; We can deduce the right-top-seg by subtracting six-set from eight-set
-         (right-top-seg (head (set->list (set-difference eight-set six-set))))
+         (right-top-seg (get-seg-from-difference eight-set six-set))
          ;;; Finally we can deduce the right-bottom-seg by subtracting right-top-seg from one-set
-         (right-bottom-seg (head (set->list (set-remove one-set right-top-seg))))
+         (right-bottom-seg (one-member (set-remove one-set right-top-seg)))
          ;;; We can get 0, 2, and 5 by adding/substracting segments to existing sets
          (zero-set (set-remove eight-set middle-seg))
          (two-set (set-put (set-remove three-set right-bottom-seg) left-bottom-seg))

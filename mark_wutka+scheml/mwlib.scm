@@ -35,3 +35,13 @@
 
 (define (list-max l)
   (fold max (head l) (tail l)))
+
+(type grid ('a) (Grid int int 'a))
+
+(define (grid-fetch g x y)
+  (let (((Grid width height data) g))
+    (if (and (and (>= x 0) (< x width))
+             (and (>= y 0) (< y height)))
+        (Just (@ data (+ x (* y width))))
+        (Nothing))))
+

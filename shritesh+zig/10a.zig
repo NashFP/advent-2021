@@ -1,5 +1,4 @@
 const std = @import("std");
-const Stack = std.BoundedArray(u8, 32);
 
 test "example" {
     const input = @embedFile("10_example.txt");
@@ -13,17 +12,16 @@ pub fn main() !void {
 
 fn run(input: []const u8) !usize {
     var total: usize = 0;
-    var stack = try Stack.init(0);
 
     var lines = std.mem.split(u8, input, "\n");
     while (lines.next()) |line|
-        total += try score(line, &stack);
+        total += try score(line);
 
     return total;
 }
 
-fn score(line: []const u8, stack: *Stack) !usize {
-    try stack.resize(0);
+fn score(line: []const u8) !usize {
+    var stack = try std.BoundedArray(u8, 32).init(0);
 
     for (line) |c| switch (c) {
         '(', '[', '{', '<' => try stack.append(c),

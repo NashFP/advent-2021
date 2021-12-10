@@ -3,7 +3,7 @@ defmodule Day09 do
     file_name
     |> parse()
     |> grid()
-    |> mark_lowest_points()
+    |> lowest_points()
     |> sum_risk_level()
   end
 
@@ -11,46 +11,34 @@ defmodule Day09 do
     file_name
   end
 
-  def sum_risk_level(grid) do
-    grid
-    |> Enum.filter(fn {_key, %{is_lowest: is_lowest}} -> is_lowest == true end)
-    |> Enum.map(fn {_key, %{risk_level: risk_level}} -> risk_level end)
+  def sum_risk_level(lowest) do
+    lowest
+    |> Enum.map(fn {_key, value} -> value + 1 end)
     |> Enum.sum()
-  end
-
-  def add_risk_level(%{is_lowest: true, elevation: elevation} = location) do
-    Map.put(location, :risk_level, elevation + 1)
-  end
-
-  def add_risk_level(location) do
-    location
   end
 
   def is_lowest(adjacent_elevations, elevation) do
     elevation < Enum.min(adjacent_elevations)
   end
 
-  def adjacent(grid, {x, y}) do
+  def smallest_adjacent(grid, {x, y}) do
     [{0, -1}, {0, 1}, {-1, 0}, {1, 0}]
     |> Enum.map(fn {dx, dy} -> Map.get(grid, {x + dx, y + dy}) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn %{elevation: elevation} -> elevation end)
+    |> Enum.min()
   end
 
-  def mark_lowest_points(grid) do
-    grid
-    |> Map.map(fn {coord, %{elevation: elevation} = location} ->
-      is_lowest = grid |> adjacent(coord) |> is_lowest(elevation)
-      new_location = %{location | is_lowest: is_lowest}
-      add_risk_level(new_location)
+  def lowest_points(grid) do
+    Map.filter(grid, fn {coord, elevation} ->
+      elevation < smallest_adjacent(grid, coord)
     end)
   end
 
   def grid(parsed) do
     for {lines, y} <- Enum.with_index(parsed),
         {elevation, x} <- Enum.with_index(lines),
-    do: {{x, y}, %{elevation: elevation, is_lowest: nil}},
-    into: Map.new()
+        do: {{x, y}, elevation},
+        into: Map.new()
   end
 
   def parse(file_name) do

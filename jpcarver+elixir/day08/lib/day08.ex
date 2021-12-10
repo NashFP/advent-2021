@@ -42,16 +42,19 @@ defmodule Day08 do
     |> Stream.map(fn line ->
       [input, output] = line |> Enum.map(fn io -> io |> Enum.map(&String.graphemes/1) end)
       decoder = decoder(input)
-
-      Enum.reduce(output, "", fn numbers, acc ->
-        key = numbers |> Enum.map(fn number -> decoder[number] end) |> Enum.sort()
-        acc <> Map.get(@letters_to_number, key)
-      end)
-      |> String.to_integer()
+      decode_output(ouput, decorder)
     end)
     |> Enum.sum()
   end
 
+  def decode_output(output, decoder) do
+    output
+    |> Enum.reduce("", fn numbers, acc ->
+      key = numbers |> Enum.map(fn number -> decoder[number] end) |> Enum.sort()
+      acc <> Map.get(@letters_to_number, key)
+    end)
+    |> String.to_integer()
+  end
 
   # You call yourself a programmer with this mess?
   def decoder(input) do

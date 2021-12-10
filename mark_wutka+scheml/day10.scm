@@ -29,7 +29,7 @@
 
 (define (day10a)
   (let* ((lines (read-lines "day10.txt"))
-         (illegals (map just (filter just? (map (find-first-illegal nil) (map string->list lines))))))
+         (illegals (map-optional (find-first-illegal nil) (map string->list lines))))
     (fold + 0 (map score-illegal illegals))))
 
 (define (build-completion-stack closer-stack chars)

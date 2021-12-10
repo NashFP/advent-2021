@@ -34,7 +34,7 @@
   (let* ((g (make-grid (read-lines "day9.txt")))
          ((Grid _ _ data) g)
          (coords (map (coord-pair g) (range 0 (- (array-length data) 1))))
-         (low-points (map fst (map just (filter just? (map (find-low g) coords))))))
+         (low-points (map fst (map-optional (find-low g) coords))))
     (fold (lambda (s p) (+ s (+ p 1))) 0 low-points)))
 
 ;;; This is just ugly, using references and some imperative forms
@@ -85,7 +85,7 @@
   (let* ((g (make-grid (read-lines "day9.txt")))
          ((Grid _ _ data) g)
          (coords (map (coord-pair g) (range 0 (- (array-length data) 1))))
-         (low-points (map just (filter just? (map (find-low g) coords))))
+         (low-points (map-optional (find-low g) coords))
          (basins (map (find-basin g) low-points)))
     (top-3 (map set-len (map ! basins)))))
 

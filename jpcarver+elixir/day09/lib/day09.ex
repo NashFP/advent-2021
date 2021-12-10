@@ -8,7 +8,37 @@ defmodule Day09 do
   end
 
   def part2(file_name \\ "test.txt") do
-    file_name
+    grid = file_name |> parse() |> grid()
+    lowest_points = lowest_points(grid) |> Map.keys()
+
+    lowest_points
+    |> Enum.map(fn coords -> basin(coords, grid) |> MapSet.size() end)
+    |> Enum.sort(:desc)
+    |> Enum.take(3)
+    |> Enum.product()
+
+  end
+
+  # Thank you, Jose
+  def basin(coords, grid) do
+    basin(MapSet.new(), coords, grid)
+  end
+
+  def basin(visited, {x, y} = coords, grid) do
+    if Map.get(grid, coords) in [nil, 9] or coords in visited do
+      visited
+    else
+      visited
+      |> MapSet.put(coords)
+      |> basin({x - 1, y}, grid)
+      |> basin({x + 1, y}, grid)
+      |> basin({x, y - 1}, grid)
+      |> basin({x, y + 1}, grid)
+    end
+  end
+
+  def deltas() do
+    [{0, -1}, {0, 1}, {-1, 0}, {1, 0}]
   end
 
   def sum_risk_level(lowest) do
@@ -22,7 +52,7 @@ defmodule Day09 do
   end
 
   def smallest_adjacent(grid, {x, y}) do
-    [{0, -1}, {0, 1}, {-1, 0}, {1, 0}]
+    deltas()
     |> Enum.map(fn {dx, dy} -> Map.get(grid, {x + dx, y + dy}) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.min()

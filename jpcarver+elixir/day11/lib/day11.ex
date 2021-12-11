@@ -7,21 +7,45 @@ defmodule Day11 do
     |> total_flashes()
   end
 
+  def part2(file_name \\ "test2.txt") do
+    file_name
+    |> parse()
+    |> grid()
+    |> find_step_all_flashing()
+  end
+
+  def find_step_all_flashing(grid, step \\ 1)
+
+  def find_step_all_flashing(grid, step) do
+    %{grid: flashed_grid} = perform_step(step, %{grid: grid, flashes: 0})
+    all_flashing = all_flashing?(flashed_grid)
+
+    if all_flashing do
+      step
+    else
+      find_step_all_flashing(flashed_grid, step + 1)
+    end
+  end
+
+  def all_flashing?(grid) do
+    Enum.all?(grid, fn {_coord, %{level: level}} -> level == 0 end)
+  end
+
   def total_flashes(%{flashes: flashes}) do
     flashes
   end
 
   def steps(grid, target_steps) do
-    Enum.reduce(1..target_steps, %{grid: grid, flashes: 0}, fn _step, %{grid: ready_grid, flashes: flashes_so_far} ->
-      leveled_up_grid = increase_level(ready_grid)
-
-      %{grid: flashed_grid, flashes: flashes} = flash(leveled_up_grid)
-
-      %{grid: flashed_grid, flashes: flashes_so_far + flashes}
-    end)
+    Enum.reduce(1..target_steps, %{grid: grid, flashes: 0}, &perform_step/2)
   end
 
-  # flash states: not_ready, flashable, flashed
+  def perform_step(_current_step, %{grid: ready_grid, flashes: flashes_so_far}) do
+    leveled_up_grid = increase_level(ready_grid)
+
+    %{grid: flashed_grid, flashes: flashes} = flash(leveled_up_grid)
+
+    %{grid: flashed_grid, flashes: flashes_so_far + flashes}
+  end
 
   def flash(grid) do
     do_flash(%{grid: grid, flashes: 0})

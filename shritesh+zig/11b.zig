@@ -62,25 +62,30 @@ fn flash(grid: *Grid, flashes: *BitSet, row: usize, col: usize) void {
     // Mark as flashed
     flashes.set(bit_index);
 
+    const has_top = row > 0;
+    const has_bottom = row + 1 < 10;
+    const has_left = col > 0;
+    const has_right = col + 1 < 10;
+
     // Flash Neighbors
-    if (row > 0) grid[row - 1][col] +|= 1; // Top
-    if (row + 1 < 10) grid[row + 1][col] +|= 1; // Bottom
-    if (col > 0) grid[row][col - 1] +|= 1; // Left
-    if (col + 1 < 10) grid[row][col + 1] +|= 1; // Right
-    if (row > 0 and col > 0) grid[row - 1][col - 1] +|= 1; // Top Left
-    if (row > 0 and col + 1 < 10) grid[row - 1][col + 1] +|= 1; // Top Right
-    if (row + 1 < 10 and col > 0) grid[row + 1][col - 1] +|= 1; // Bottom Left
-    if (row + 1 < 10 and col + 1 < 10) grid[row + 1][col + 1] +|= 1; // Bottom Right
+    if (has_top) grid[row - 1][col] +|= 1; // Top
+    if (has_bottom) grid[row + 1][col] +|= 1; // Bottom
+    if (has_left) grid[row][col - 1] +|= 1; // Left
+    if (has_right) grid[row][col + 1] +|= 1; // Right
+    if (has_top and has_left) grid[row - 1][col - 1] +|= 1; // Top Left
+    if (has_top and has_right) grid[row - 1][col + 1] +|= 1; // Top Right
+    if (has_bottom and has_left) grid[row + 1][col - 1] +|= 1; // Bottom Left
+    if (has_bottom and has_right) grid[row + 1][col + 1] +|= 1; // Bottom Right
 
     // Make neigbors flash
-    if (row > 0) flash(grid, flashes, row - 1, col); // Top
-    if (row + 1 < 10) flash(grid, flashes, row + 1, col); // Bottom
-    if (col > 0) flash(grid, flashes, row, col - 1); // Left
-    if (col + 1 < 10) flash(grid, flashes, row, col + 1); // Right
-    if (row > 0 and col > 0) flash(grid, flashes, row - 1, col - 1); // Top Left
-    if (row > 0 and col + 1 < 10) flash(grid, flashes, row - 1, col + 1); // Top Right
-    if (row + 1 < 10 and col > 0) flash(grid, flashes, row + 1, col - 1); // Bottom Left
-    if (row + 1 < 10 and col + 1 < 10) flash(grid, flashes, row + 1, col + 1); // Bottom Right
+    if (has_top) flash(grid, flashes, row - 1, col); // Top
+    if (has_bottom) flash(grid, flashes, row + 1, col); // Bottom
+    if (has_left) flash(grid, flashes, row, col - 1); // Left
+    if (has_right) flash(grid, flashes, row, col + 1); // Right
+    if (has_top and has_left) flash(grid, flashes, row - 1, col - 1); // Top Left
+    if (has_top and has_right) flash(grid, flashes, row - 1, col + 1); // Top Right
+    if (has_bottom and has_left) flash(grid, flashes, row + 1, col - 1); // Bottom Left
+    if (has_bottom and has_right) flash(grid, flashes, row + 1, col + 1); // Bottom Right
 }
 
 fn parse(input: []const u8) Grid {

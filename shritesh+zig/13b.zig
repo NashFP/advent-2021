@@ -69,9 +69,9 @@ const Paper = struct {
             var x: usize = 0;
             while (x < self.width) : (x += 1) {
                 if (self.dots.isSet(y * size + x)) {
-                    std.debug.print("#", .{});
+                    std.debug.print("█", .{});
                 } else {
-                    std.debug.print(".", .{});
+                    std.debug.print(" ", .{});
                 }
             }
 

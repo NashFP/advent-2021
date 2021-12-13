@@ -42,7 +42,7 @@ defmodule Day08 do
     |> Stream.map(fn line ->
       [input, output] = line |> Enum.map(fn io -> io |> Enum.map(&String.graphemes/1) end)
       decoder = decoder(input)
-      decode_output(ouput, decorder)
+      decode_output(output, decoder)
     end)
     |> Enum.sum()
   end

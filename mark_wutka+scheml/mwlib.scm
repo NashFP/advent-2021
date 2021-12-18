@@ -73,3 +73,11 @@
         (height (length l))
         (values (list->array (fold append (head l) (tail l)))))
     (Grid width height values)))
+
+(define (cartesian-product' l1 l2 acc)
+  (if (empty? l1) (reverse acc)
+      (cartesian-product' (tail l1) l2
+                         (append (map (Pair (head l1)) l2) acc))))
+
+(define (cartesian-product l1 l2)
+  (cartesian-product' l1 (reverse l2) nil))

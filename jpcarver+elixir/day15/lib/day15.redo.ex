@@ -21,7 +21,6 @@ defmodule Day15.Redo do
       |> MapSet.to_list()
       |> Enum.min_by(fn {distance, _point} -> distance end)
 
-
     {element |> elem(1), MapSet.delete(queue, element)}
   end
 
@@ -49,7 +48,7 @@ defmodule Day15.Redo do
 
        {new_queue, new_costs} =
         Enum.reduce(points_with_distances, {queue, costs}, fn {neighbor, distance}, {acc_queue, acc_costs} ->
-          if MapSet.member?(visited, neighbor) do
+          if MapSet.member?(new_visited, neighbor) do
             {acc_queue, acc_costs}
           else
             old_cost = costs[neighbor]

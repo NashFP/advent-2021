@@ -81,3 +81,38 @@
 
 (define (cartesian-product l1 l2)
   (cartesian-product' l1 (reverse l2) nil))
+
+(define (take-while' f l acc)
+  (if (empty? l) (reverse acc)
+      (if (f (head l)) (take-while' f (tail l) (cons (head l) acc))
+          (take-while' f (tail l) acc))))
+
+(define (take-while f l) (take-while' f l nil))
+
+(define (drop-while' f l acc)
+  (if (empty? l) (reverse acc)
+      (if (f (head l)) (take-while' f (tail l) acc)
+          (drop-while' f (tail l) (cons (head l) acc)))))
+
+(define (drop-while f l) (drop-while' f l nil))
+
+(type stream ('a) (Stream (ref (cons 'a))))
+
+(define (make-stream l) (Stream (Ref l)))
+
+(define (peek-stream str)
+  (let (((Stream s) str))
+    (if (empty? (! s)) (Nothing)
+        (Just (head (! s))))))
+
+(define (end-of-stream? str)
+  (let (((Stream s) str))
+    (empty? (! s))))
+
+(define (read-stream str)
+  (let (((Stream s) str))
+    (if (empty? (! s)) (Nothing)
+        (let ((val (head (! s))))
+          (<- s (tail (! s)))
+          (Just val)))))
+
